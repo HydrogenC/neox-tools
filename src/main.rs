@@ -4,9 +4,9 @@ use log::{debug, info, trace};
 use std::io::{BufRead, BufReader, Read, Seek};
 
 fn is_eof<T>(reader: &mut std::io::BufReader<T>) -> std::io::Result<bool>
-where
-    T: std::io::Read,
-    T: std::io::Seek,
+    where
+        T: std::io::Read,
+        T: std::io::Seek,
 {
     let mut buffer = vec![0; 0x1];
     let eof_check = reader.read_exact(&mut buffer);
@@ -180,8 +180,8 @@ impl NeoXIndex1_32 {
         let encrypt_type = 0;
 
         if compress_type >= 62 {
-          offset ^= (uncompressed_size + 99) ^ 0x85F6F276;
-          compress_type = compress_type - 62;
+            offset ^= (uncompressed_size + 99) ^ 0x85F6F276;
+            compress_type = compress_type - 62;
         }
 
         Ok(Self {
@@ -228,7 +228,7 @@ impl NeoXIndex2 {
         let name_hash = slice.read_u64::<LittleEndian>()?;
         let offset = slice.read_u32::<LittleEndian>()?;
         let compressed_size = slice.read_u32::<LittleEndian>()?;
-        let uncompressed_size = slice.read_u32::<LittleEndian>()?; 
+        let uncompressed_size = slice.read_u32::<LittleEndian>()?;
 
         let _field_14 = slice.read_u32::<LittleEndian>()?;
         let _field_18 = slice.read_u64::<LittleEndian>()?;
@@ -300,10 +300,10 @@ impl NeoXIndex {
 
     pub fn offset(&self) -> u64 {
         match self {
-            Self::Version1(index) =>    index.offset as u64 | (index.large_file_offset as u64) << 20,
-            Self::Version1_2(index) =>  index.offset as u64 | (index.large_file_offset as u64) << 20,
-            Self::Version1_32(index) =>  index.offset as u64 | (index.large_file_offset as u64) << 20,
-            Self::Version2(index) =>    index.offset as u64 | (index.large_file_offset as u64) << 20,
+            Self::Version1(index) => index.offset as u64 | (index.large_file_offset as u64) << 20,
+            Self::Version1_2(index) => index.offset as u64 | (index.large_file_offset as u64) << 20,
+            Self::Version1_32(index) => index.offset as u64 | (index.large_file_offset as u64) << 20,
+            Self::Version2(index) => index.offset as u64 | (index.large_file_offset as u64) << 20,
         }
     }
 
@@ -320,9 +320,9 @@ impl NeoXIndex {
         &self,
         reader: &mut std::io::BufReader<T>,
     ) -> Result<Vec<u8>, NeoXIndexError>
-    where
-        T: std::io::Read,
-        T: std::io::Seek,
+        where
+            T: std::io::Read,
+            T: std::io::Seek,
     {
         let offset = self.offset();
         let compress_type = self.compress_type();
@@ -435,9 +435,9 @@ struct NpkReader {
 
 impl NpkReader {
     fn read_header<T>(reader: &mut std::io::BufReader<T>) -> Result<NpkHeader, Npk2Error>
-    where
-        T: std::io::Read,
-        T: std::io::Seek,
+        where
+            T: std::io::Read,
+            T: std::io::Seek,
     {
         //
         let file_size = reader.seek(std::io::SeekFrom::End(0))?;
@@ -508,13 +508,13 @@ impl NpkReader {
 
         if !is_eof(&mut reader)? {
             unimplemented!("Handle this type of NPK file, embedded file names :)");
-        // debug!(
-        //     "Reading more stuff...no idea what :) {} != {}",
-        //     index_size, field_28
-        // );
-        // let mut buffer = vec![0; 0x100];
-        // trace!("Reading {} bytes", 0x100);
-        // reader.read_exact(&mut buffer)?;
+            // debug!(
+            //     "Reading more stuff...no idea what :) {} != {}",
+            //     index_size, field_28
+            // );
+            // let mut buffer = vec![0; 0x100];
+            // trace!("Reading {} bytes", 0x100);
+            // reader.read_exact(&mut buffer)?;
         } else {
             // Load all the indices from the NPK File
             let mut buffer_cursor = std::io::Cursor::new(buffer);
@@ -524,15 +524,15 @@ impl NpkReader {
                     NpkVersion::Version1 => {
                         let index = NeoXIndex1::from_slice(sub_buffer.as_mut_slice())?;
                         NeoXIndex::Version1(index)
-                    },
+                    }
                     NpkVersion::Version1_2 => {
                         let index = NeoXIndex1_2::from_slice(sub_buffer.as_mut_slice())?;
                         NeoXIndex::Version1_2(index)
-                    },
+                    }
                     NpkVersion::Version1_32 => {
                         let index = NeoXIndex1_32::from_slice(sub_buffer.as_mut_slice())?;
                         NeoXIndex::Version1_32(index)
-                    },
+                    }
                     NpkVersion::Version2 => {
                         let index = NeoXIndex2::from_slice(sub_buffer.as_mut_slice())?;
                         NeoXIndex::Version2(index)
@@ -555,8 +555,8 @@ impl NpkReader {
 }
 
 fn load_file_name_hash_mappings<T>(reader: &mut T, version: NpkVersion) -> std::collections::HashMap<u64, String>
-where
-    T: std::io::BufRead,
+    where
+        T: std::io::BufRead,
 {
     info!("Parsing filelist");
     let mut file_mappings = std::collections::HashMap::new();
@@ -567,7 +567,7 @@ where
             let r = regex::Regex::new(
                 r"(\S+)(?:\s+)(\S+)(?:\s+)(\S+)(?:\s+)(\S+)(?:\s+)(\S+)(?:\s+)(\S.*)",
             )
-            .unwrap();
+                .unwrap();
             let caps = r.captures(&line);
             if let Some(caps) = caps {
                 let name_hash = caps.get(2).unwrap().as_str().parse::<u64>().unwrap();
@@ -582,19 +582,19 @@ where
                         &mut Cursor::new(line.clone().replace("/", "\\")),
                         0x9747B28C,
                     )
-                    .unwrap();
+                        .unwrap();
                     file_mappings.insert(hash as u64, line.to_string());
                 } else {
                     let top = murmur3_32(
                         &mut Cursor::new(line.clone().replace("/", "\\")),
                         0x9747B28C,
                     )
-                    .unwrap();
+                        .unwrap();
                     let bottom = murmur3_32(
                         &mut Cursor::new(line.clone().replace("/", "\\")),
                         0xC82B7479,
                     )
-                    .unwrap();
+                        .unwrap();
                     let hash = (bottom as i64 | (top as i64) << 0x20) as i64;
                     file_mappings.insert(hash as u64, line.to_string());
                 }
@@ -614,31 +614,31 @@ fn main() -> Result<(), Npk2Error> {
         .version("1.0")
         .author("Alexander Guettler <alexander@guettler.io>")
         .subcommand(App::new("x")
-        .about("Unpack one or more NPKS")
-        .arg(
-            Arg::new("INPUT")
-                .about("The NPK file(s) to be operated on")
-                .required(true)
-                .multiple(true)
-                .index(1),
-        )
-        .arg(
-            Arg::new("DIR")
-                .short('d')
-                .long("dir")
-                .value_name("DIR")
-                .about("The directory where this NPK file should be extracted to")
-                .default_value("out")
-                .takes_value(true),
-        )
-        .arg(
-            Arg::new("FILELIST")
-            .short('f')
-            .long("filelist")
-            .value_name(
-                "FILELIST"
-            ).about("Supplies a file list to the npk unpack which will be used to try and reconstruct the original file tree\nWhen INPUT is supplied with a list of all resX.npk files this may be determined and used automatically.")
-        ))
+            .about("Unpack one or more NPKS")
+            .arg(
+                Arg::new("INPUT")
+                    .about("The NPK file(s) to be operated on")
+                    .required(true)
+                    .multiple(true)
+                    .index(1),
+            )
+            .arg(
+                Arg::new("DIR")
+                    .short('d')
+                    .long("dir")
+                    .value_name("DIR")
+                    .about("The directory where this NPK file should be extracted to")
+                    .default_value("out")
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::new("FILELIST")
+                    .short('f')
+                    .long("filelist")
+                    .value_name(
+                        "FILELIST"
+                    ).about("Supplies a file list to the npk unpack which will be used to try and reconstruct the original file tree\nWhen INPUT is supplied with a list of all resX.npk files this may be determined and used automatically.")
+            ))
         .get_matches();
 
     match matches.subcommand() {
@@ -677,8 +677,8 @@ fn main() -> Result<(), Npk2Error> {
                             {
                                 Ok(_) => load_file_name_hash_mappings(&mut std::io::Cursor::new(
                                     &decompressed,
-                                ), 
-                                npk_file.header.version),
+                                ),
+                                                                      npk_file.header.version),
                                 Err(_) => load_file_name_hash_mappings(&mut std::io::Cursor::new(
                                     &content,
                                 ), npk_file.header.version),
@@ -714,7 +714,7 @@ fn main() -> Result<(), Npk2Error> {
                             println!("Possible file hash {}", index.name_hash());
                             println!("Possible file hash {}", index.name_hash());
                         }
-                        Err(_) => {},
+                        Err(_) => {}
                     }
                     let file_name = match file_list.get(&index.name_hash()) {
                         Some(file_name) => file_name.clone(),
@@ -739,15 +739,18 @@ fn main() -> Result<(), Npk2Error> {
                                         match magic {
                                             Ok(magic) => {
                                                 // Detect NXS and stuff, which is a NeoX Script File
-                                                if magic == 0x041D {
+                                                if magic & 0xFFFF == 0x041D {
                                                     "nxs"
-                                                } else if magic & 0xFFFF == 0x041D {
-                                                    "nxs"
-                                                } else {
-                                                    if magic == 0x58544BAB {
-                                                        "ktx"
-                                                    } else {
-                                                        "dat"
+                                                }else {
+                                                    match magic {
+                                                        0x041D => "nxs",
+                                                        0x58544BAB => "ktx",
+                                                        0xBBC88034 => "mesh",
+                                                        // A unidentified text file with header "ÁYA"
+                                                        0xD4159C1 => "aya",
+                                                        // A unidentified text file with header "NTRK"
+                                                        0x4B52544E => "ntrk",
+                                                        _ => "dat"
                                                     }
                                                 }
                                             }
@@ -759,6 +762,7 @@ fn main() -> Result<(), Npk2Error> {
                                     "image/ktx" => "ktx",
                                     "image/png" => "png",
                                     "image/x-dds" => "dds",
+                                    "image/x-tga" => "tga",
                                     "image/x-win-bitmap" => "bmp",
                                     "application/xml" => "xml",
                                     "text/x-matlab" => "mat", // Maybe m instead?
@@ -772,8 +776,8 @@ fn main() -> Result<(), Npk2Error> {
                                     "image/vnd.zbrush.pcx" => "pcx",
                                     "audio/mpeg" => "mp3",
                                     "audio/x-wav" => "wav",
-                                    "application/x-java-jce-keystore" => ".pem",
-                                    "application/x-font-ttf" => ".ttf",
+                                    "application/x-java-jce-keystore" => "pem",
+                                    "application/x-font-ttf" => "ttf",
                                     _ => {
                                         pb.println(format!("Unhandled mime type {}", result));
                                         // error!("Unhandled mime type {}", result);
